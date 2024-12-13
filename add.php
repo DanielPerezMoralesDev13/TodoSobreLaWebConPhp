@@ -1,3 +1,33 @@
+<!-- Author: Daniel Benjamin Perez Morales -->
+<!-- GitHub: https://github.com/DanielPerezMoralesDev13 -->
+<!-- Email: danielperezdev@proton.me -->
+
+<?php
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $contact = [
+      "name" => $_POST["name"],
+      "phone_number" => $_POST["phone_number"]
+    ];
+
+    if (file_exists(__DIR__ . "/contacts.json")){
+      $contacts = json_decode(file_get_contents(__DIR__ . "/contacts.json"), true);
+    } else {
+      $contacts = [];
+    }
+    
+    $contacts[] = $contact;
+    if (!is_writable(__DIR__)) {
+      // if (defined('STDERR')) {
+      //   fwrite(STDERR, "[x] No Se Puede Escribir En El Archivo contacts.json \n");
+      // }
+      error_log("[x] No Se Puede Escribir En El Archivo contacts.json");
+    } else {
+      file_put_contents(__DIR__ . "/contacts.json", json_encode($contacts));
+      header("Location: ./index.php");
+    }
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,8 +38,9 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap -->
-  <!-- Bootswatch -->
+  <!-- Bootstrap: Biblioteca CSS y JS para diseño y componentes frontend -->
+  <!-- Bootswatch: Temas personalizados para Bootstrap -->
+  <!-- Enlace a Bootswatch desde una CDN (cdnjs) -->
   <!-- https://cdnjs.com/libraries/bootswatch -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/5.3.3/darkly/bootstrap.min.css"
@@ -18,6 +49,8 @@
     referrerpolicy="no-referrer" />
 
 
+  <!-- Bootstrap JavaScript Bundle (incluye Popper.js) -->
+  <!-- Enlace a Bootstrap desde jsDelivr CDN -->
   <!-- https://www.bootstrapcdn.com/ -->
   <script defer
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -56,7 +89,7 @@
           <li class="nav-item">
             <a class="nav-link active"
               aria-current="page"
-              href="./index.html">Home</a>
+              href="./index.php">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link"
@@ -75,7 +108,8 @@
           <div class="card">
             <div class="card-header">Add New Contact</div>
             <div class="card-body">
-              <form>
+              <form method="post"
+                action="./add.php">
                 <div class="mb-3 row">
                   <label for="name"
                     class="col-md-4 col-form-label text-md-end">Name</label>
@@ -124,3 +158,20 @@
 </body>
 
 </html>
+
+<!-- 
+
+method="post"
+
+  Especifica el método HTTP que se usará para enviar los datos del formulario al servidor.
+  En este caso, el método es POST, que:
+    Transmite los datos en el cuerpo de la solicitud HTTP, no en la URL (a diferencia de GET).
+    Es más adecuado para enviar datos sensibles o grandes volúmenes de información, ya que no expone los datos en la barra de direcciones del navegador.
+    Es utilizado típicamente en operaciones como agregar, actualizar o eliminar datos.
+
+action="./add.php"
+
+  Define la URL o ruta a la que se enviarán los datos del formulario.
+  En este caso, el archivo add.php, ubicado en el mismo directorio que la página actual (./ indica el directorio actual).
+  Cuando el formulario se envíe, el servidor ejecutará el código en add.php, que probablemente procesará los datos enviados.
+-->
